@@ -1,79 +1,62 @@
-import re
-from this import d
-from fastapi import APIRouter, FastAPI, HTTPException
-from fastapi_sqlalchemy import DBSessionMiddleware,db
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
 
-from models import *
+from . import crud, models, schemas
+from .database import SessionLocal, engine
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 
-# Create a router for the API
-app.add_middleware(DBSessionMiddleware, db_url="psql://postgres:1@localhost:5432/postgres")
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
-# Fleet API
+# Fleet
 
-# Get a list of all fleets
-@app.get("/fleets")
-def get_fleets():
-    return db.query(Fleet).all()
+# Create a fleet
+@app.post("/fleet/", response_model=schemas.Fleet)
+async def create_fleet(db: Session = Depends(get_db)):
+    
 
-# Get a fleet by id
-@app.get("/fleets/{id}")
-def get_fleets_by_id(id):
-    f = db.session.get(Fleet, id=id)
-    if not f:
-        raise HTTPException(status_code=404, detail="Fleet not found")
-    return f
 
-# Create a new fleet
-@app.post("/fleets",response_model=Fleet)
-def create_fleet(fleet: Fleet):
-    db.session.add(fleet)
-    db.session.commit()
-    return "Fleet created"
 
-# Update a fleet
-@app.patch("/fleets/{id}",response_model=Fleet)
-def update_fleet(id:int, fleet: Fleet):
-        f = db.session.get(Fleet, id)
-        if not f:
-            raise HTTPException(status_code=404, detail="Fleet not found")
-        data = fleet.dict(exclude_unset=True)
-        for key, value in data.items():
-            setattr(f, key, value)
-        db.session.add(f)
-        db.session.commit()
-        db.session.refresh(f)
-        return f
 
-# Delete a fleet
-@app.delete("/fleets/{id}")
-def delete_fleet(id: int):
-    db.delete(db.query(Fleet).where(Fleet.id == id).first())
-    return "Fleet deleted"
+@app.post("/users/", response_model=schemas.User)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_email(db, email=user.email)
+    if db_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return crud.create_user(db=db, user=user)
 
-# Vehicle API
 
-# Get a list of all vehicles
-@app.get("/vehicles")
-def get_vehicles():
-    return db.query(Vehicle).all()
+@app.get("/users/", response_model=list[schemas.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
 
-# Get a vehicle by id
-@app.get("/vehicles/{id}")
-def get_vehicle(id: int):
-    return db.query(Vehicle).where(Vehicle.id == id).first()
 
-# Create a new vehicle
-@app.post("/vehicles",response_model=Vehicle)
-def create_vehicle(vehicle: Vehicle):
-    db.add(vehicle)
-    db.commit()
-    return "Vehicle created"
+@app.get("/users/{user_id}", response_model=schemas.User)
+def read_user(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user(db, user_id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
 
-# Update a vehicle
-@app.patch("/vehicles/{id}",response_model=Vehicle)
-def update_vehicle(id: int, vehicle: Vehicle):
-    db.update(vehicle)
-    db.commit()
+
+@app.post("/users/{user_id}/items/", response_model=schemas.Item)
+def create_item_for_user(
+    user_id: int, item: schemas.ItemCreate, db: Session = Depends(get_db)
+):
+    return crud.create_user_item(db=db, item=item, user_id=user_id)
+
+
+@app.get("/items/", response_model=list[schemas.Item])
+def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    items = crud.get_items(db, skip=skip, limit=limit)
+    return items
