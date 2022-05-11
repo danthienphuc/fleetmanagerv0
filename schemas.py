@@ -22,13 +22,13 @@ class Fleet(FleetBase):
 # Vehicle schema
 class VehicleBase(BaseModel):
     name: str
+    fleet_id: int
 
 class VehicleCreate(VehicleBase):
     pass
 
 class Vehicle(VehicleBase):
     id: int
-    fleet_id: int
 
     class Config:
         orm_mode = True

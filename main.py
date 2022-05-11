@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
+from typing import List
 
 import crud, models, schemas
 from database import SessionLocal, engine
@@ -26,7 +27,7 @@ async def create_fleet(fleet:schemas.Fleet,db: Session = Depends(get_db)):
     return fleet
     
 # Get all fleets
-@app.get("/fleets/", response_model=list[schemas.Fleet])
+@app.get("/fleets/", response_model=List[schemas.Fleet])
 async def get_fleets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_fleets(db=db, skip=skip, limit=limit)
 
@@ -54,7 +55,7 @@ async def create_vehicle(vehicle:schemas.Vehicle,db: Session = Depends(get_db)):
     return vehicle
 
 # Get all vehicles
-@app.get("/vehicles/", response_model=list[schemas.Vehicle])
+@app.get("/vehicles/", response_model=List[schemas.Vehicle])
 async def get_vehicles(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_vehicles(db=db, skip=skip, limit=limit)
 
@@ -82,7 +83,7 @@ async def create_driver(driver:schemas.Driver,db: Session = Depends(get_db)):
     return driver
 
 # Get all drivers
-@app.get("/drivers/", response_model=list[schemas.Driver])
+@app.get("/drivers/", response_model=List[schemas.Driver])
 async def get_drivers(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_drivers(db=db, skip=skip, limit=limit)
 
@@ -110,7 +111,7 @@ async def create_route(route:schemas.Route,db: Session = Depends(get_db)):
     return route
 
 # Get all routes
-@app.get("/routes/", response_model=list[schemas.Route])
+@app.get("/routes/", response_model=List[schemas.Route])
 async def get_routes(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_routes(db=db, skip=skip, limit=limit)
 
@@ -138,7 +139,7 @@ async def create_routedetail(routedetail:schemas.RouteDetail,db: Session = Depen
     return routedetail
 
 # Get all route details
-@app.get("/routedetails/", response_model=list[schemas.RouteDetail])
+@app.get("/routedetails/", response_model=List[schemas.RouteDetail])
 async def get_route_details(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_route_details(db=db, skip=skip, limit=limit)
 
