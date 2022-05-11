@@ -2,6 +2,9 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+
+
+
 # Fleet schema
 class FleetBase(BaseModel):
     name: str
@@ -11,7 +14,7 @@ class FleetCreate(FleetBase):
 
 class Fleet(FleetBase):
     id: int
-    vehicle:list[Vehicle] = []
+    
 
     class Config:
         orm_mode = True
@@ -56,54 +59,15 @@ class Route(RouteBase):
     class Config:
         orm_mode = True
 
-# Route Details schema
+# Route Detail schema
 
-class RouteDetailsBase(BaseModel):
+class RouteDetailBase(BaseModel):
     pass
 
-class RouteDetailsCreate(RouteDetailsBase):
+class RouteDetailCreate(RouteDetailBase):
     pass
 
-class RouteDetails(RouteDetailsBase):
+class RouteDetail(RouteDetailBase):
     route_id: int
     vehicle_id: int
     driver_id: int
-
-
-
-
-
-
-# Item schema
-class ItemBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: list[Item] = []
-
-    class Config:
-        orm_mode = True
