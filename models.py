@@ -31,7 +31,7 @@ class Route(Base):
     id = Column(Integer, primary_key=True,index=True)
     name = Column(String(100), index=True)
 
-class RouteDetails(Base):
+class RouteDetail(Base):
     __tablename__ = "routedetails"
 
     route_id = Column(Integer, ForeignKey("routes.id"), primary_key=True)

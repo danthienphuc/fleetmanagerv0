@@ -94,14 +94,15 @@ def update_driver(db: Session, driver_id: int, driver: schemas.Driver):
     else:
         raise HTTPException(status_code=404, detail="Driver not found")
 
-def delete_user_item(db: Session, item_id: int, user_id: int):
-    db_item = get_user_item(db, item_id, user_id)
-    if db_item:
-        db.delete(db_item)
+def delete_driver(db: Session, driver_id: int):
+    db_driver = get_driver(db, driver_id)
+    if db_driver:
+        db.delete(db_driver)
         db.commit()
-        return db_item
+        return db_driver
     else:
-        raise HTTPException(status_code=404, detail="Item not found")
+        raise HTTPException(status_code=404, detail="Driver not found")
+    
 
 # CRUD operations for Route
 def create_route(db: Session, route: schemas.RouteCreate):
@@ -144,8 +145,8 @@ def create_route_detail(db: Session, route_detail: schemas.RouteDetailCreate):
     db.refresh(db_route_detail)
     return db_route_detail
 
-def get_route_detail(db: Session, route_detail_id: int):
-    return db.query(models.RouteDetail).filter(models.RouteDetail.id == route_detail_id).first()
+def get_route_detail(db: Session, route_id: int,vehicle_id: int):
+    return db.query(models.RouteDetail).filter(models.RouteDetail.route_id == route_id,models.RouteDetail.vehicle_id ==vehicle_id).first()
 
 def get_route_details(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.RouteDetail).offset(skip).limit(limit).all()
@@ -160,8 +161,8 @@ def update_route_detail(db: Session, route_detail_id: int, route_detail: schemas
     else:
         raise HTTPException(status_code=404, detail="RouteDetail not found")
 
-def delete_route_detail(db: Session, route_detail_id: int):
-    db_route_detail = get_route_detail(db, route_detail_id)
+def delete_route_detail(db: Session, route_id: int,vehicle_id: int):
+    db_route_detail = get_route_detail(db, route_id, vehicle_id)
     if db_route_detail:
         db.delete(db_route_detail)
         db.commit()

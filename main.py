@@ -153,8 +153,8 @@ async def update_route_detail(route_detail_id: int, route_detail: schemas.RouteD
     return crud.update_route_detail(db=db, route_detail_id=route_detail_id, route_detail=route_detail)
 
 # Delete a route detail
-@app.delete("/routedetail/{route_detail_id}", response_model=schemas.RouteDetail)
-async def delete_route_detail(route_detail_id: int, db: Session = Depends(get_db)):
-    return crud.delete_route_detail(db=db, route_detail_id=route_detail_id)
+@app.delete("/routedetail/{route_id}{vehicle_id}", response_model=schemas.RouteDetail)
+async def delete_route_detail(route_id: int,vehicle_id, db: Session = Depends(get_db)):
+    return crud.delete_route_detail(db=db, route_id=route_id, vehicle_id=vehicle_id)
 
 
